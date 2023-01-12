@@ -4,6 +4,12 @@ import ReactDOM from 'react-dom';
 interface AppProps {
 	color?: string;
 }
+
+// Function Component with Typescript
+// const App = (props: AppProps): JSX.Element => {
+// 	return <div>{props.color}</div>;
+// };
+
 // interface AppState {
 // 	counter: number;
 // }
@@ -32,4 +38,4 @@ class App extends React.Component<AppProps /*, AppState*/> {
 	}
 }
 
-ReactDOM.render(<App color='red' />, document.querySelector('#root'));
+ReactDOM.render(<App color='blue' />, document.querySelector('#root'));
