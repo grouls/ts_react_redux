@@ -1,25 +1,62 @@
-import { Todo, fetchTodos } from '../actions';
+import { Todo, deleteTodo, fetchTodos } from '../actions';
 
-import React                from 'react';
-import { StoreState }       from '../reducers';
-import { connect }          from 'react-redux';
+import React                            from 'react';
+import { StoreState }                   from '../reducers';
+import { connect }                      from 'react-redux';
 
 interface AppProps {
 	todos: Todo[];
-	fetchTodos(): any;
+	fetchTodos: Function;
+	deleteTodo: typeof deleteTodo;
 }
 
-class _App extends React.Component<AppProps> {
-	componentDidMount(): void {
-		this.props.fetchTodos();
+interface AppState {
+	fetching: boolean;
+}
+class _App extends React.Component<AppProps, AppState> {
+	constructor(props: AppProps) {
+		super(props);
+		this.state = { fetching: false };
 	}
+
+	componentDidUpdate(prevProps: AppProps): void {
+		if (!prevProps.todos.length && this.props.todos.length) {
+			this.setState({ fetching: false });
+		}
+	}
+
+	onButtonClick = (): void => {
+		this.setState({ fetching: true });
+		this.props.fetchTodos();
+	};
+
+	onTodoClick = (id: number): void => {
+		this.props.deleteTodo(id);
+	};
+
+	renderList(): JSX.Element[] {
+		return this.props.todos.map((todo: Todo) => {
+			return (
+				<div key={todo.id} onClick={() => this.onTodoClick(todo.id)}>
+					{todo.title}
+				</div>
+			);
+		});
+	}
+
 	render() {
-		return <div>Hello World</div>;
+		return (
+			<div>
+				<button onClick={this.onButtonClick}>Fetch</button>
+				{this.state.fetching ? <div>LOADING</div> : null}
+				{this.renderList()}
+			</div>
+		);
 	}
 }
 
 const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
-	return { todos: todos };
+	return { todos };
 };
 
-export const App = connect(mapStateToProps, { fetchTodos })(_App);
+export const App = connect(mapStateToProps, { fetchTodos, deleteTodo })(_App);
